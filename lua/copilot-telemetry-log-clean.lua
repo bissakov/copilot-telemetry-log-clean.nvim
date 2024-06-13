@@ -16,6 +16,8 @@ M.opts = {
 ---@return boolean success
 ---@return string? error_message
 M.clean = function(opts)
+  vim.notify('Cleaning GitHub Copilot telemetry from LSP log', vim.log.levels.INFO)
+
   local context_manager = require 'plenary.context_manager'
   local with = context_manager.with
   local open = context_manager.open
