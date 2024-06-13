@@ -77,7 +77,7 @@ end
 function M.setup(opts)
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
 
-  vim.api.nvim_create_autocmd('VimLeavePre', {
+  vim.api.nvim_create_autocmd('VimLeave', {
     desc = 'Clean GitHub Copilot telemetry and any other possible lines from LSP log',
     group = vim.api.nvim_create_augroup('kickstart-clean-copilot-log', { clear = true }),
     callback = function()
