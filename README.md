@@ -1,47 +1,52 @@
-# A Neovim Plugin Template
+# copilot-telemetry-log-clean.nvim
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ellisonleao/nvim-plugin-template/lint-test.yml?branch=main&style=for-the-badge)
 ![Lua](https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua)
 
-A template repository for Neovim plugins.
+Clean lsp.log from GitHub Copilot telemetry messages
 
-## Using it
+<!-- TOC -->
 
-Via `gh`:
+- [Motivation](#motivation)
+- [Requirements](#requirements)
+- [Installation](#installation)
 
+<!-- /TOC -->
+
+## Motivation
+
+GitHub Copilot tends to clutter the lsp.log file with telemetry messages. Especially when the requests to telemetry server are filtered by DNS rules, such as Pi-hole or NextDNS.
+Example:
 ```
-$ gh repo create my-plugin -p ellisonleao/nvim-plugin-template
+[ERROR][2024-06-13 15:00:05] ...lsp/handlers.lua:623	"[default] Error sending telemetry FetchError: getaddrinfo ENOENT copilot-telemetry-service.githubusercontent.com\n    at fetch (C:\\Users\\bissa\\AppData\\Local\\nvim-data\\lazy\\copilot.vim\\node_modules\\@adobe\\helix-fetch\\src\\fetch\\index.js:99:11)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at cachingFetch (C:\\Users\\bissa\\AppData\\Local\\nvim-data\\lazy\\copilot.vim\\node_modules\\@adobe\\helix-fetch\\src\\fetch\\index.js:288:16)\n    at Kre.fetch (C:\\Users\\bissa\\AppData\\Local\\nvim-data\\lazy\\copilot.vim\\lib\\src\\network\\helix.ts:78:22) {\n  type: 'system',\n  _name: 'FetchError',\n  code: 'ENOENT',\n  errno: -4058,\n  erroredSysCall: 'getaddrinfo'\n}"
+```
+This plugin aims to clean the lsp.log file upon exitting Neovim.
+
+## Requirements
+
+- Neovim >= 0.5.0
+
+## Installation
+
+- lazy.nvim
+
+```lua
+{
+  'bissakov/copilot-telemetry-log-clean.nvim',
+  -- default options
+  -- opts = {
+  --   lsp_log_path = vim.lsp.get_log_path(),
+  --   condition = function(line)
+  --     return string.find(line, 'telemetry') ~= nil
+  --   end,
+  -- },
+  dependencies = {
+    'j-hui/fidget.nvim',
+    'nvim-lua/plenary.nvim',
+  },
+  config = function()
+    require('copilot-telemetry-log-clean').setup()
+  end,
+}
 ```
 
-Via github web page:
-
-Click on `Use this template`
-
-![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
-
-## Features and structure
-
-- 100% Lua
-- Github actions for:
-  - running tests using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and [busted](https://olivinelabs.com/busted/)
-  - check for formatting errors (Stylua)
-  - vimdocs autogeneration from README.md file
-  - luarocks release (LUAROCKS_API_KEY secret configuration required)
-
-### Plugin structure
-
-```
-.
-├── lua
-│   ├── plugin_name
-│   │   └── module.lua
-│   └── plugin_name.lua
-├── Makefile
-├── plugin
-│   └── plugin_name.lua
-├── README.md
-├── tests
-│   ├── minimal_init.lua
-│   └── plugin_name
-│       └── plugin_name_spec.lua
-```
