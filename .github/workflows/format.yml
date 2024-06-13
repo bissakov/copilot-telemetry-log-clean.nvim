@@ -12,4 +12,4 @@ jobs:
         with:
           version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --color always --config-path ./.stylua.toml
+          args: --color always --config-path ./.stylua.toml ./**/*.lua
