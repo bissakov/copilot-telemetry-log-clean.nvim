@@ -16,8 +16,6 @@ M.opts = {
 ---@return boolean success
 ---@return string? error_message
 M.clean = function(opts)
-  local fidget = require 'fidget'
-
   local context_manager = require 'plenary.context_manager'
   local with = context_manager.with
   local open = context_manager.open
@@ -42,30 +40,30 @@ M.clean = function(opts)
   end)
 
   if writer_result == nil then
-    fidget.notify('Error cleaning log', vim.log.levels.ERROR)
+    vim.notify('Error cleaning log', vim.log.levels.ERROR)
     return false, 'Error cleaning log'
   end
 
-  fidget.notify(
+  vim.notify(
     'Deleted ' .. telemetry_lines .. ' telemetry lines from ' .. total_lines .. ' total lines',
     vim.log.levels.INFO
   )
 
   local success, error_message = os.remove(opts.lsp_log_path)
   if not success then
-    fidget.notify('Error removing log: ' .. error_message, vim.log.levels.ERROR)
+    vim.notify('Error removing log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
   success, error_message = os.rename(temp_lsp_log_path, opts.lsp_log_path)
   if not success then
-    fidget.notify('Error renaming temp log: ' .. error_message, vim.log.levels.ERROR)
+    vim.notify('Error renaming temp log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
   success, error_message = os.remove(temp_lsp_log_path)
   if not success then
-    fidget.notify('Error removing temp log: ' .. error_message, vim.log.levels.ERROR)
+    vim.notify('Error removing temp log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
