@@ -53,19 +53,16 @@ M.clean = function(opts)
 
   local success, error_message = os.remove(opts.lsp_log_path)
   if not success then
-    vim.notify('Error removing log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
   success, error_message = os.rename(temp_lsp_log_path, opts.lsp_log_path)
   if not success then
-    vim.notify('Error renaming temp log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
   success, error_message = os.remove(temp_lsp_log_path)
   if not success then
-    vim.notify('Error removing temp log: ' .. error_message, vim.log.levels.ERROR)
     return false, error_message
   end
 
@@ -81,7 +78,10 @@ function M.setup(opts)
     desc = 'Clean GitHub Copilot telemetry and any other possible lines from LSP log',
     group = vim.api.nvim_create_augroup('kickstart-clean-copilot-log', { clear = true }),
     callback = function()
-      M.clean(M.opts)
+      local success, error_message = M.clean(M.opts)
+      if not success then
+        vim.notify('Error cleaning log: ' .. error_message, vim.log.levels.ERROR)
+      end
     end,
   })
 end
