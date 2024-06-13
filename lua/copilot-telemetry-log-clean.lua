@@ -73,7 +73,7 @@ M.clean = function(opts)
 end
 
 ---Setup the cleaner
----@param opts Options
+---@param opts Options?
 function M.setup(opts)
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
 
