@@ -16,6 +16,7 @@ M.opts = {
 ---Reads lines from the lsp log and writes non-telemetry lines to a temporary file
 ---@param opts Options
 ---@param temp_lsp_log_path string The path to the temporary log file
+---@return number found_count The number of telemetry lines found
 ---@return boolean success
 ---@return string? error_message
 M.process_log_lines = function(opts, temp_lsp_log_path)
@@ -23,11 +24,15 @@ M.process_log_lines = function(opts, temp_lsp_log_path)
   local with = context_manager.with
   local open = context_manager.open
 
+  local found_count = 0
+
   local success = with(open(temp_lsp_log_path, 'w'), function(writer)
     local success = with(open(opts.lsp_log_path, 'r'), function(reader)
       for line in reader:lines() do
         if not opts.condition(line) then
           writer:write(line .. '\n')
+        else
+          found_count = found_count + 1
         end
       end
       return true
@@ -41,10 +46,10 @@ M.process_log_lines = function(opts, temp_lsp_log_path)
   end)
 
   if success == false then
-    return false, 'Error processing log lines'
+    return found_count, false, 'Error processing log lines'
   end
 
-  return true, nil
+  return found_count, true, nil
 end
 
 ---Attempt to perform a file operation with retries until timeout
@@ -107,10 +112,21 @@ M.clean = function(opts)
 
   local temp_lsp_log_path = opts.lsp_log_path .. '.tmp'
 
-  local success, error_message = M.process_log_lines(opts, temp_lsp_log_path)
+  local found_count, success, error_message = M.process_log_lines(opts, temp_lsp_log_path)
   if not success then
     vim.notify('Error cleaning log', vim.log.levels.ERROR)
     return false, error_message
+  end
+
+  if found_count == 0 then
+    vim.notify('No telemetry lines found in log', vim.log.levels.INFO)
+
+    success, error_message = os.remove(temp_lsp_log_path)
+    if not success then
+      return false, error_message
+    end
+
+    return true
   end
 
   success, error_message = M.replace_log_file(opts, temp_lsp_log_path)
