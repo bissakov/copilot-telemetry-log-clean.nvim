@@ -39,6 +39,7 @@ This plugin aims to clean the lsp.log file upon exitting Neovim.
   --   condition = function(line)
   --     return string.find(line, 'telemetry') ~= nil
   --   end,
+  --   timeout = 5000,
   -- },
   dependencies = {
     'j-hui/fidget.nvim',
