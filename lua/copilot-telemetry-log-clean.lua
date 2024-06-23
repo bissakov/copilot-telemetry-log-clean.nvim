@@ -108,19 +108,14 @@ end
 ---@return boolean success
 ---@return string? error_message
 M.clean = function(opts)
-  vim.notify('Cleaning GitHub Copilot telemetry from LSP log', vim.log.levels.INFO)
-
   local temp_lsp_log_path = opts.lsp_log_path .. '.tmp'
 
   local found_count, success, error_message = M.process_log_lines(opts, temp_lsp_log_path)
   if not success then
-    vim.notify('Error cleaning log', vim.log.levels.ERROR)
     return false, error_message
   end
 
   if found_count == 0 then
-    vim.notify('No telemetry lines found in log', vim.log.levels.INFO)
-
     success, error_message = os.remove(temp_lsp_log_path)
     if not success then
       return false, error_message
@@ -149,6 +144,8 @@ end
 ---Setup the cleaner
 ---@param opts Options?
 function M.setup(opts)
+  local fidget = require 'fidget'
+
   M.close_lsp_clients()
 
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
@@ -159,7 +156,7 @@ function M.setup(opts)
     callback = function()
       local success, error_message = M.clean(M.opts)
       if not success then
-        vim.notify('Error cleaning log: ' .. error_message, vim.log.levels.ERROR)
+        fidget.notify('Error cleaning log: ' .. error_message, vim.log.levels.ERROR)
       end
     end,
   })
