@@ -132,21 +132,18 @@ M.clean = function(opts)
   return true
 end
 
----Close all LSP clients
----@return nil
-M.close_lsp_clients = function()
-  local clients = vim.lsp.get_clients()
-  for _, client in ipairs(clients) do
-    client.stop()
-  end
-end
-
 ---Setup the cleaner
 ---@param opts Options?
 function M.setup(opts)
   local fidget = require 'fidget'
 
-  M.close_lsp_clients()
+  local clients = vim.lsp.get_clients()
+  if #clients == 0 then
+    return
+  end
+  for _, client in ipairs(clients) do
+    client.stop()
+  end
 
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
 
