@@ -137,9 +137,20 @@ M.clean = function(opts)
   return true
 end
 
+---Close all LSP clients
+---@return nil
+M.close_lsp_clients = function()
+  local clients = vim.lsp.get_clients()
+  for _, client in ipairs(clients) do
+    client.stop()
+  end
+end
+
 ---Setup the cleaner
 ---@param opts Options?
 function M.setup(opts)
+  M.close_lsp_clients()
+
   M.opts = vim.tbl_deep_extend('force', M.opts, opts or {})
 
   vim.api.nvim_create_autocmd('VimLeavePre', {
